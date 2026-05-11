@@ -1,0 +1,70 @@
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import dotenv from 'dotenv';
+import { connectDatabase } from './database';
+{{range .Schema.Tables}}
+import { {{camelCase .Name}}Router } from './routes/{{snakeCase .Name}}.generated';
+{{end}}
+
+// Load environment variables
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(helmet());
+app.use(cors());
+app.use(express.json());
+app.use(morgan('combined'));
+
+// Health check
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    service: '{{.ProjectName}}'
+  });
+});
+
+// API Routes
+{{range .Schema.Tables}}
+app.use('/api/v1/{{kebabCase (plural .Name)}}', {{camelCase .Name}}Router);
+{{end}}
+
+// 404 handler
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not found' });
+});
+
+// Error handler
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error('Error:', err);
+  res.status(500).json({
+    error: 'Internal server error',
+    message: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
+});
+
+// Start server
+const startServer = async () => {
+  try {
+    // Connect to database
+    await connectDatabase();
+
+    app.listen(PORT, () => {
+      console.log(`🚀 Server running on port ${PORT}`);
+      console.log(`📝 Health check: http://localhost:${PORT}/health`);
+      {{range .Schema.Tables}}
+      console.log(`   {{pascalCase .Name}}: http://localhost:${PORT}/api/v1/{{kebabCase (plural .Name)}}`);
+      {{end}}
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+startServer();

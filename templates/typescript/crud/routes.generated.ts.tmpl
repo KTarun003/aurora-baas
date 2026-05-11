@@ -1,0 +1,21 @@
+import { Router } from 'express';
+import create{{ .PascalName }}Router from './controller.generated';
+{{ .CustomRoutesImport }}
+
+export const register{{ .PascalName }}Routes = (app: any): void => {
+  const router = Router();
+
+  // Auto-generated CRUD routes
+  router.use('/{{ .PluralName }}', create{{ .PascalName }}Router());
+
+  {{ .BeforeCustomRoutesHook }}
+  // Custom routes can be added here via extension
+  {{ if .HasCustomRoutes }}
+  router.use('/{{ .PluralName }}', custom{{ .PascalName }}Routes);
+  {{ end }}
+  {{ .AfterCustomRoutesHook }}
+
+  app.use('/api', router);
+};
+
+export default register{{ .PascalName }}Routes;

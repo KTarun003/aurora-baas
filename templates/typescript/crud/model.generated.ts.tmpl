@@ -1,0 +1,26 @@
+import { z } from 'zod';
+
+{{ .BeforeSchemaHook }}
+export const {{ .PascalName }}CreateSchema = z.object({
+  {{ range .Fields }}{{ .Name }}: z.{{ .ZodType }}(),
+  {{ end }}
+});
+
+export const {{ .PascalName }}UpdateSchema = z.object({
+  {{ range .Fields }}{{ .Name }}: z.{{ .ZodType }}().optional(),
+  {{ end }}
+});
+{{ .AfterSchemaHook }}
+
+export type {{ .PascalName }}Create = z.infer<typeof {{ .PascalName }}CreateSchema>;
+export type {{ .PascalName }}Update = z.infer<typeof {{ .PascalName }}UpdateSchema>;
+
+{{ .BeforeTypeHook }}
+export interface {{ .PascalName }} {
+  id: string;
+  {{ range .Fields }}{{ .Name }}: {{ .TypeScriptType }};
+  {{ end }}
+  createdAt: Date;
+  updatedAt: Date;
+}
+{{ .AfterTypeHook }}

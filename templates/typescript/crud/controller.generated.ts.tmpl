@@ -1,0 +1,75 @@
+import { Request, Response, Router } from 'express';
+import { validate } from '../middleware/validation';
+import { authenticate } from '../middleware/auth';
+{{ .HooksImport }}
+
+export const create{{ .PascalName }}Router = (): Router => {
+  const router = Router();
+
+  // Apply authentication middleware
+  router.use(authenticate);
+
+  {{ .BeforeCreateHook }}
+  router.post('/', validate({{ .PascalName }}CreateSchema), async (req: Request, res: Response) => {
+    try {
+      const created = await prisma.{{ .CamelName }}.create({
+        data: req.body,
+      });
+      {{ .AfterCreateHook }}
+      res.status(201).json(created);
+    } catch (error) {
+      res.status(400).json({ error: String(error) });
+    }
+  });
+  {{ .EndBeforeCreateHook }}
+
+  {{ .BeforeReadHook }}
+  router.get('/:id', async (req: Request, res: Response) => {
+    try {
+      const item = await prisma.{{ .CamelName }}.findUnique({
+        where: { id: req.params.id },
+      });
+      if (!item) {
+        return res.status(404).json({ error: 'Not found' });
+      }
+      {{ .AfterReadHook }}
+      res.json(item);
+    } catch (error) {
+      res.status(500).json({ error: String(error) });
+    }
+  });
+  {{ .EndBeforeReadHook }}
+
+  {{ .BeforeUpdateHook }}
+  router.put('/:id', validate({{ .PascalName }}UpdateSchema), async (req: Request, res: Response) => {
+    try {
+      const updated = await prisma.{{ .CamelName }}.update({
+        where: { id: req.params.id },
+        data: req.body,
+      });
+      {{ .AfterUpdateHook }}
+      res.json(updated);
+    } catch (error) {
+      res.status(400).json({ error: String(error) });
+    }
+  });
+  {{ .EndBeforeUpdateHook }}
+
+  {{ .BeforeDeleteHook }}
+  router.delete('/:id', async (req: Request, res: Response) => {
+    try {
+      await prisma.{{ .CamelName }}.delete({
+        where: { id: req.params.id },
+      });
+      {{ .AfterDeleteHook }}
+      res.status(204).send();
+    } catch (error) {
+      res.status(400).json({ error: String(error) });
+    }
+  });
+  {{ .EndBeforeDeleteHook }}
+
+  return router;
+};
+
+export default create{{ .PascalName }}Router;

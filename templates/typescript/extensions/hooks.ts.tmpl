@@ -1,0 +1,54 @@
+/**
+ * Hooks for {{ .PascalName }}
+ *
+ * These hooks allow you to execute custom logic at specific points
+ * in the request lifecycle without modifying generated code.
+ */
+
+{{ .BeforeCreateHookDef }}
+export const beforeCreate{{ .PascalName }} = async (data: any): Promise<void> => {
+  // Add custom logic before creation
+  // For example: validation, data transformation, logging
+};
+
+export const afterCreate{{ .PascalName }} = async (created: any): Promise<void> => {
+  // Add custom logic after creation
+  // For example: trigger events, update related records
+};
+{{ .AfterCreateHookDef }}
+
+{{ .BeforeReadHookDef }}
+export const beforeRead{{ .PascalName }} = async (id: string): Promise<void> => {
+  // Add custom logic before reading
+  // For example: audit logging, permission checks
+};
+
+export const afterRead{{ .PascalName }} = async (item: any): Promise<void> => {
+  // Add custom logic after reading
+  // For example: data enrichment, filtering
+};
+{{ .AfterReadHookDef }}
+
+{{ .BeforeUpdateHookDef }}
+export const beforeUpdate{{ .PascalName }} = async (id: string, data: any): Promise<void> => {
+  // Add custom logic before updating
+  // For example: validation, audit logging
+};
+
+export const afterUpdate{{ .PascalName }} = async (updated: any): Promise<void> => {
+  // Add custom logic after updating
+  // For example: trigger events, cache invalidation
+};
+{{ .AfterUpdateHookDef }}
+
+{{ .BeforeDeleteHookDef }}
+export const beforeDelete{{ .PascalName }} = async (id: string): Promise<void> => {
+  // Add custom logic before deletion
+  // For example: check dependencies, audit logging
+};
+
+export const afterDelete{{ .PascalName }} = async (id: string): Promise<void> => {
+  // Add custom logic after deletion
+  // For example: cleanup, cascade deletes
+};
+{{ .AfterDeleteHookDef }}

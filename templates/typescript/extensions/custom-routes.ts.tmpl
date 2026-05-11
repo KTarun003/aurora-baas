@@ -1,0 +1,26 @@
+import { Router, Request, Response } from 'express';
+import { authenticate } from '../middleware/auth';
+
+/**
+ * Custom routes for {{ .PascalName }}
+ *
+ * These routes extend the auto-generated CRUD endpoints.
+ * Add your custom business logic here.
+ */
+export const custom{{ .PascalName }}Routes = Router();
+
+// Apply authentication
+custom{{ .PascalName }}Routes.use(authenticate);
+
+{{ .CustomRoutesHook }}
+// Example custom route:
+// custom{{ .PascalName }}Routes.post('/bulk-import', async (req: Request, res: Response) => {
+//   try {
+//     const results = await bulkImport(req.body);
+//     res.json(results);
+//   } catch (error) {
+//     res.status(400).json({ error: String(error) });
+//   }
+// });
+
+export default custom{{ .PascalName }}Routes;
